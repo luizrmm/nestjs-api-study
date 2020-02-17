@@ -6,36 +6,41 @@ import {
   Delete,
   Body,
   Param,
+  UsePipes,
+
 } from '@nestjs/common';
 import { IdeaService } from './idea.service';
 import { IdeaDTO } from './idea.dto';
+import { ValidationPipe } from '../shared/validation.pipe';
 
 @Controller('idea')
 export class IdeaController {
-  constructor(private ideaService: IdeaService) {}
+  constructor(private ideaService: IdeaService) { }
 
   @Get()
-  showAllIdeas() {
+  showAllIdeas () {
     return this.ideaService.showAll();
   }
 
-  @Post()
-  createIdea(@Body() idea: IdeaDTO) {
-    return this.ideaService.create(idea);
-  }
-
   @Get(':id')
-  readIdea(@Param('id') id: string) {
+  readIdea (@Param('id') id: string) {
     return this.ideaService.read(id);
   }
 
+  @Post()
+  @UsePipes(new ValidationPipe())
+  createIdea (@Body() idea: IdeaDTO) {
+    return this.ideaService.create(idea);
+  }
+
   @Put(':id')
-  updateIdea(@Param('id') id: string, @Body() idea: IdeaDTO) {
+  @UsePipes(new ValidationPipe())
+  updateIdea (@Param('id') id: string, @Body() idea: Partial<IdeaDTO>) {
     return this.ideaService.update(id, idea);
   }
 
   @Delete(':id')
-  destroyIdea(@Param('id') id: string) {
+  destroyIdea (@Param('id') id: string) {
     return this.ideaService.destroy(id);
   }
 }
